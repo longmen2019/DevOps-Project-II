@@ -1,0 +1,49 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+
+# Terraform variable files containing secrets
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Sensitive backup files created by Terraform
+.terraform.tfstate.backup
+
+# Terraform directories
+.terraform/
+
+# Terraform plan output (can contain sensitive data)
+*.tfplan
+
+# Local override files or environment-specific configs
+terraform.tfvars.local
+.env
+.env.*
+
+# Cloud provider credentials and config (if colocated)
+.terraformrc
+terraform.rc
+aws_credentials
+*.pem
+*.key
+*.crt
+
+# IDE/workspace settings (optional but useful)
+.vscode/
+.idea/
+*.swp
+*.bak
+*~
+
+# Node/npm, Python, etc. (if mixing stacks)
+node_modules/
+__pycache__/
+*.py[cod]
+
