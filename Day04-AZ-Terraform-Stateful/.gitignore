@@ -1,0 +1,65 @@
+# Ignore Terraform specific files
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+*.tfvars
+*.tfvars.json
+
+# Ignore sensitive credentials and configuration files
+*.tfvars.example  # Example variable files (often checked in, but without real values)
+*.auto.tfvars     # Automatically loaded variable files (should not contain secrets)
+*.auto.tfvars.json
+
+# Ignore environment-specific files (optional, but good practice)
+env/*            # If you store environment-specific configurations
+*.tf.json        # Generated JSON configuration files
+
+# Ignore other common sensitive files
+.env
+.env.*
+credentials.json
+credentials
+
+# Ignore IDE/editor files
+.idea/
+.vscode/
+.DS_Store
+
+# Ignore OS-specific files
+Thumbs.db
+
+# Ignore crash reports
+crash.log
+
+# Ignore modules downloaded by Terraform (usually cached in .terraform)
+.terraform/modules
+
+# Ignore any automatically generated documentation
+*.html
+*.md
+*.txt
+
+# Ignore Packer files, if used
+packer_cache/
+packer.log
+
+# Ignore Ansible files, if used (adapt as needed)
+.ansible/
+roles/
+group_vars/
+host_vars/
+
+
+# Ignore AWS credentials (adapt if using a different cloud provider)
+.aws
+
+# Azure Credentials
+.azure
+
+# Google Cloud credentials
+.config/gcloud
+
+# Kubernetes configuration
+.kube/config
