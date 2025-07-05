@@ -23,6 +23,48 @@ variable "allowed_vm_sizes" {
     type = list(string)
     description = "Allowed VM Sizes"
     default = ["Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2"]
+  
+}
 
+variable "is_delete" {
+    type = bool 
+    description = "the default behavior to os disk upon vm termination"
+    default = true 
+  
+}
+
+variable "vm_config" {
+    type = object({
+      size = string 
+      publisher = string
+      offer = string 
+      sku = string 
+      version = string  
+    })
+    description = "Virtual machine configuration"
+    default = {
+        size = "Standard_DS1_v2"
+        publisher = "Canonical"
+        offer = "0001-com-ubuntu-server-jammy"
+        sku = "22_04-lts"
+        version = "latest"
+    }
+  
+}
+variable "storage_disk" {
+    type = number
+    description = "the storage disk size of os"
+    default = 80
+  
+}
+
+variable "resource_tags" {
+    type = map(string)
+    description = "tags to apply to the resource"
+    default = {
+      "environment" = "staging"
+      "managed_by" = "terraform"
+      "department" = "devops"
+    }
   
 }
