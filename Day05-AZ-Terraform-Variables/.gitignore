@@ -1,0 +1,36 @@
+# Terraform state and backup files
+*.tfstate
+*.tfstate.*
+.crash
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
+
+# Local .env or credential files
+.env
+.env.*
+
+# Sensitive files for automation or cloud credentials
+*.pem
+*.key
+*.crt
+*.pfx
+*.cer
+*.jks
+*.keystore
+*.kdb
+*.srl
+
+# Ignore VSCode settings and IDE configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS-specific clutter
+.DS_Store
+Thumbs.db
