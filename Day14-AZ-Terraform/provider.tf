@@ -1,20 +1,25 @@
-# Configure the Azure provider, you can have many
-# if you use azurerm provider, it's source is hashicorp/azurerm
-# short for registry.terraform.io/hashicorp/azurerm
-
-
 terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.8.0"
+      version = "3.51.0"
+    }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "3.5.1"
     }
   }
-
-  required_version = ">= 1.9.0"
 }
-# configures the provider
 
 provider "azurerm" {
   features {}
+}
+
+data "azurerm_client_config" "current" {}
+
+# A resource group is like a folder for related resources. You can delete the resource group to delete all resources in it.
+resource "azurerm_resource_group" "rg" {
+  name     = "terraform-tutorial"
+  location = "westus3"
 }
