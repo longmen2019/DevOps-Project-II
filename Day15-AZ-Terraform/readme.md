@@ -1,0 +1,1 @@
+https://learn.microsoft.com/en-us/azure/developer/terraform/azurerm/hub-spoke-hub-network
