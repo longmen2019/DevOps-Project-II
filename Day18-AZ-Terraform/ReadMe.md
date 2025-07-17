@@ -1,72 +1,92 @@
 
-```markdown
-# 🚀 Azure Linux Function App Deployment with Terraform
 
-This project uses [Terraform](https://www.terraform.io/) to provision a fully functional **Azure Linux Function App** including its required infrastructure components.
+```markdown
+# 🎯 Azure QR Code Generator – Terraform Deployment
+
+This project provisions an Azure Linux Function App using Terraform to host a serverless QR code generation API. The function takes a URL input and returns a QR code image, storing it securely in Azure Blob Storage.
+
+---
 
 ## 📦 What It Deploys
 
-- **Resource Group**: `day18-rg` in Canada Central
+- **Resource Group**: `day18-rg` in *Canada Central*
 - **Storage Account**: `longmenazureterraform` (Standard tier, locally redundant)
-- **App Service Plan**: Linux-based `example-app-service-plan` with SKU `B1`
-- **Linux Function App**: `example-linux-function-app-LM` configured with Node.js v18 runtime
+- **App Service Plan**: Linux-based, SKU `B1`
+- **Linux Function App**: Node.js v18 runtime configured for QR code generation
 
-## 🛠️ Prerequisites
+---
 
-- Azure CLI authenticated and configured
-- Terraform ≥ 1.3 installed
-- Azure subscription with sufficient permissions
+## 🚀 QR Code API Endpoint
 
-## 📁 Project Structure
+Once deployed, your Azure Function will expose an endpoint like:
 
-```plaintext
-.
-├── main.tf            # Core Terraform definitions
-├── variables.tf       # (Optional) Variable definitions
-├── outputs.tf         # (Optional) Output configuration
-└── README.md          # Project documentation
+```
+https://<function-app-name>.azurewebsites.net/api/GenerateQRCode
 ```
 
-## ⚙️ How to Deploy
+### 🧪 Sample `curl` Request
 
-1. **Initialize Terraform**
-   ```bash
-   terraform init
-   ```
+```bash
+curl -X GET https://example-linux-function-app-LM.azurewebsites.net/api/GenerateQRCode \
+     -H "Content-Type: application/json" \
+     -d '{"url":"https://www.thecloudopscommunity.org"}'
+```
 
-2. **Preview the deployment**
-   ```bash
-   terraform plan
-   ```
+The function responds with a JSON payload:
 
-3. **Apply the configuration**
-   ```bash
-   terraform apply
-   ```
+```json
+{
+  "qr_code_url": "https://<your-storage-account>.blob.core.windows.net/qr-codes/example.png"
+}
+```
 
-4. **Confirm when prompted** to begin provisioning resources.
+---
 
-## 🌐 Function App Details
+## 🔧 Prerequisites
 
-The Function App is pre-configured for Node.js 18. You can deploy your function code using [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local).
+- [Terraform](https://www.terraform.io/) ≥ 1.3
+- Azure CLI authenticated
+- [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) installed
+- Node.js ≥ 18 for local development
 
-Example publish command:
+---
+
+## 📁 Usage
+
+### 1. Deploy Infrastructure
+
+```bash
+terraform init
+terraform apply
+```
+
+### 2. Publish Function Code
+
 ```bash
 func azure functionapp publish example-linux-function-app-LM
 ```
 
-## 📋 Notes
+---
 
-- The storage account name must be globally unique.
-- Default authentication is not configured—consider integrating with Entra ID for secure access.
-- Be sure to clean up resources to avoid incurring unexpected costs:
-  ```bash
-  terraform destroy
-  ```
+## 🌐 Tech Stack
 
-## 👨‍💻 Author
+- **Terraform** for infrastructure-as-code
+- **Node.js & Azure Functions** for serverless execution
+- **Azure Blob Storage** for hosting generated QR images
+- **QRCode NPM Package** for image creation
 
-Created and maintained by the CloudOps wizard behind longmen@docker 🧙‍♂️  
-If you'd like to extend this with slot-based deployments, automated publishing, or role-based access control, enhancements are welcome!
+---
 
+## 🧼 Cleanup
+
+```bash
+terraform destroy
+```
+
+---
+
+## 👨‍💻 Maintainer
+
+Built by Longmen — architecting scalable QR-driven workflows into the cloud ☁️📷  
+Let me know if you'd like a version with CI/CD integration or slot-based deployments!
 ```
