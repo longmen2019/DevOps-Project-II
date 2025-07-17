@@ -1,17 +1,51 @@
-# Terraform state and backup files
+# 🌍 Terraform state and config
 *.tfstate
 *.tfstate.*
-.crash
-.terraform/
-.terraform.lock.hcl
 terraform.tfvars
 terraform.tfvars.json
+.terraform/
+.terraform.lock.hcl
+.crash
 
-# Local .env or credential files
+# 📦 Node.js dependencies and package artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tgz
+package-lock.json
+yarn.lock
+jspm_packages/
+.npm/
+.yarn-integrity
+
+# 🧪 Build and coverage output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+*.lcov
+
+# 🛠️ Runtime and diagnostic data
+*.pid
+*.seed
+*.pid.lock
+pids
+report.*.json
+.node_repl_history
+
+# 🧬 TypeScript and tooling caches
+.tsbuildinfo
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# 🔐 Environment variables and credentials
 .env
 .env.*
-
-# Sensitive files for automation or cloud credentials
+!.env.example
 *.pem
 *.key
 *.crt
@@ -22,15 +56,17 @@ terraform.tfvars.json
 *.kdb
 *.srl
 
-# Ignore VSCode settings and IDE configs
+# 🧑‍💻 IDE/editor configs
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+
+# 🧹 Miscellaneous and OS clutter
+*.log
 *.swp
 *.swo
-
-# Logs
-*.log
-
-# OS-specific clutter
+*.bak
+*.tmp
 .DS_Store
 Thumbs.db
