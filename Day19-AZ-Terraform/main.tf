@@ -1,7 +1,12 @@
+variable "prefix" {
+  default = "tfvmex"
+}
+
 resource "azurerm_resource_group" "app_rg" {
   name     = "Day19-LM"
   location = "East US"
 }
+
 resource "azurerm_virtual_network" "main" {
   name                = "example-vnet"
   address_space       = ["10.0.0.0/16"]
@@ -32,7 +37,8 @@ resource "azurerm_network_security_group" "vm_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-    security_rule {
+
+  security_rule {
     name                       = "HTTP"
     priority                   = 1002
     direction                  = "Inbound"
@@ -44,7 +50,6 @@ resource "azurerm_network_security_group" "vm_nsg" {
     destination_address_prefix = "*"
   }
 }
-
 
 resource "azurerm_public_ip" "vm_ip" {
   name                = "acceptanceTestPublicIp1"
@@ -74,6 +79,75 @@ resource "azurerm_subnet_network_security_group_association" "example" {
 resource "null_resource" "deployment_prep" {
   triggers = {
     always_run = timestamp()
-  }}
-  
+  }
+  provisioner "local-exec" {
+    command = "echo 'Deployment started at ${timestamp()}' > deployment-${replace(timestamp(), ":", "-")}.log"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "demo_vm" {
+  name                = "${var.prefix}-vm"
+  resource_group_name = azurerm_resource_group.app_rg.name
+  location            = azurerm_resource_group.app_rg.location
+  size                = "Standard_B1s"
+  admin_username      = "azureuser"
+  network_interface_ids = [azurerm_network_interface.main.id]
+  disable_password_authentication = true
+
+  depends_on = [null_resource.deployment_prep]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+
+  os_disk {
+    name                 = "myosdisk1"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y nginx",
+      "echo '<html><body><h1>#28daysofAZTerraform is Awesome!</h1></body></html>' | sudo tee /var/www/html/index.html",
+      "sudo systemctl start nginx",
+      "sudo systemctl enable nginx"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = file("~/.ssh/id_rsa")
+      host        = azurerm_public_ip.vm_ip.ip_address
+    }
+  }
+
+  provisioner "file" {
+    source = "${path.module}/configs/sample.config"
+    destination = "/home/azureuser/sample.conf"
+
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = file("~/.ssh/id_rsa")
+      host        = azurerm_public_ip.vm_ip.ip_address
+    }
+  }
+
+  tags = {
+    environment = "staging"
+  }
+}
+
+output "vm_public_ip" {
+  value = azurerm_public_ip.vm_ip.ip_address
 }
