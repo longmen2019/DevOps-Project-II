@@ -70,3 +70,10 @@ report.*.json
 *.tmp
 .DS_Store
 Thumbs.db
+
+# Email files
+*.eml
+*.msg
+*.mbox
+*.pst
+*.ost
