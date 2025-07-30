@@ -1,0 +1,18 @@
+resource "azapi_resource" "api_permissions" {
+  type      = "Microsoft.Graph/applications@1.0"
+  name      = "svprincipal-lm"
+  parent_id = azurerm_application.svprincipal_lm.id
+  body = jsonencode({
+    requiredResourceAccess = [
+      {
+        resourceAppId = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+        resourceAccess = [
+          {
+            id   = "df021288-bdef-4463-88db-98f22de89214"       # AccessReview.ReadWrite.All
+            type = "Role"
+          }
+        ]
+      }
+    ]
+  })
+}
