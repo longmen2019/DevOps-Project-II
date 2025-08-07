@@ -1,0 +1,186 @@
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+default:
+  image:
+    name: hashicorp/terraform:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+  before_script:
+    - cd infra/
+    - terraform init -upgrade
+
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - infra/.terraform/
+
+Terraform_validate:
+  stage: validate
+  script:
+    - cd infra/
+    - terraform validate
+
+Terraform_plan:
+  stage: plan
+  script:
+    - cd infra/
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - infra/tfplan
+  dependencies:
+    - Terraform_validate 
+
+Terraform_apply:
+  stage: apply
+  script:
+    - cd infra/
+    - terraform apply -auto-approve tfplan
+  when: on_success
+  dependencies:
+    - Terraform_plan
+
+destroy:
+  stage: destroy
+  script:
+    - cd infra/
+    - terraform destroy -auto-approve
+  when: manual
+  dependencies:
+    - Terraform_apply
+# # image:
+# #   name: hashicorp/terraform:latest
+# #   entrypoint: [""]
+
+# # stages:
+# #   - import
+# #   - validate
+# #   - plan
+# #   - target_subnet
+# #   - apply
+
+# # variables:
+# #   RESOURCE_GROUP: "three-tier-app-rg3-prod"
+# #   LOCATION: "northeurope"
+# #   STORAGE_ACCOUNT: "tfstate1754168270"
+# #   CONTAINER_NAME: "vhds-lm"
+# #   ARM_CLIENT_ID: "$ARM_CLIENT_ID"
+# #   ARM_CLIENT_SECRET: "$ARM_CLIENT_SECRET"
+# #   ARM_SUBSCRIPTION_ID: "$ARM_SUBSCRIPTION_ID"
+# #   ARM_TENANT_ID: "$ARM_TENANT_ID"
+
+# # import:
+# #   stage: import
+# #   script:
+# #     - terraform init
+# #     - echo "🧩 Importing resource group..."
+# #     - terraform import azurerm_resource_group.main "/subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP"
+# #     - echo "🧩 Importing storage account..."
+# #     - terraform import azurerm_storage_account.stacc-lm "/subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
+# #     - echo "🧩 Importing blob container..."
+# #     - terraform import azurerm_storage_container.example "$STORAGE_ACCOUNT/$CONTAINER_NAME"
+
+# # validate:
+# #   stage: validate
+# #   script:
+# #     - terraform fmt -check
+# #     - terraform validate
+
+# # plan:
+# #   stage: plan
+# #   script:
+# #     - terraform plan -out=tfplan
+# #   artifacts:
+# #     paths:
+# #       - tfplan
+
+# # target_subnet:
+# #   stage: target_subnet
+# #   script:
+# #     - terraform init
+# #     # - echo "🚀 Targeted apply: public subnet"
+# #     - terraform apply -target=module.networking.azurerm_subnet.public -auto-approve
+
+# # apply:
+# #   stage: apply
+# #   script:
+# #     - terraform apply -auto-approve tfplan
+# #   when: manual
+
+
+# stages:
+#   - validate
+#   # - import
+#   - plan
+#   - apply
+#   - destroy
+
+# default:
+#   image:
+#     name: hashicorp/terraform:latest
+#     entrypoint:
+#       - /usr/bin/env
+#       - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+#   before_script:
+#     - terraform init -upgrade
+
+#   cache:
+#     key: $CI_COMMIT_REF_SLUG
+#     paths:
+#       - .terraform/
+
+# Terraform_validate:
+#   stage: validate
+#   script:
+#     - terraform validate
+
+# # Terraform_Import:
+# #   stage: import
+# #   script:
+# #     - |
+# #       # Set environment variables for the subscription ID and resource group name
+# #       export SUB_ID="e12adcfa-03e1-4916-bd5a-09418f9235d4"
+# #       export RESOURCE_GROUP="three-tier-app-rg3-prod"
+      
+# #       # NOTE: It's a best practice to run `terraform init` before any other commands
+# #       terraform init
+
+# #       # Import the existing Azure Resource Group
+# #       # The resource address "azurerm_resource_group.main" must match the name 
+# #       # of the resource block in your .tf configuration file.
+# #       echo "Importing azurerm_resource_group.main..."
+# #       terraform import azurerm_resource_group.main "/subscriptions/$SUB_ID/resourceGroups/$RESOURCE_GROUP"
+
+# # Terraform_plan:
+# #   stage: plan
+# #   script:
+# #     - terraform plan -out=tfplan
+# #   artifacts:
+# #     paths:
+# #       - tfplan
+# #   dependencies:
+# #     - Terraform_validate 
+
+# # Terraform_apply:
+# #   stage: apply
+# #   script:
+# #     - terraform apply -auto-approve tfplan
+# #   when: on_success
+# #   dependencies:
+# #     - Terraform_plan
+
+# # destroy:
+# #   stage: destroy
+# #   script:
+# #     - terraform destroy -auto-approve
+# #   when: manual
+# #   dependencies:
+# #     - Terraform_apply

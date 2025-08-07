@@ -1,0 +1,82 @@
+# stages:
+#   - import_rg
+#   - provision_acr
+
+# variables:
+#   AZURE_SUBSCRIPTION_ID: "e12adcfa-03e1-4916-bd5a-09418f9235d4"
+
+# Import_Resource_Group:
+#   stage: import_rg
+#   image: alpine:latest
+#   before_script:
+#     - apk add --no-cache bash curl unzip
+#     - curl -fsSL https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip -o terraform.zip
+#     - unzip terraform.zip
+#     - mv terraform /usr/local/bin/
+#   script:
+#     - cd infra/
+#     - terraform init
+#     - terraform import azurerm_resource_group.main "/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/three-tier-app-prod"
+
+# Provision_ACR:
+#   stage: provision_acr
+#   image: alpine:latest
+#   before_script:
+#     - apk add --no-cache bash curl jq unzip
+#     - curl -fsSL https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip -o terraform.zip
+#     - unzip terraform.zip
+#     - mv terraform /usr/local/bin/
+#   script:
+#     - cd infra/
+#     - terraform init
+#     - terraform apply -auto-approve -target=module.acr
+#     - terraform output -json > acr_outputs.json
+#     - echo "ACR_NAME=$(jq -r .acr_name.value acr_outputs.json)" >> acr_env.sh
+#     - echo "ACR_LOGIN=$(jq -r .login_server.value acr_outputs.json)" >> acr_env.sh
+#   artifacts:
+#     paths:
+#       - infra/acr_env.sh
+#   dependencies:
+#     - Import_Resource_Group
+
+
+stages:
+  - import_rg
+  - provision_acr
+
+variables:
+  AZURE_SUBSCRIPTION_ID: "e12adcfa-03e1-4916-bd5a-09418f9235d4"
+
+Import_Resource_Group:
+  stage: import_rg
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl unzip
+    - curl -fsSL https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip -o terraform.zip
+    - unzip terraform.zip
+    - mv terraform /usr/local/bin/
+  script:
+    - cd infra/
+    - terraform init
+    - terraform import azurerm_resource_group.main "/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/three-tier-app-rg-prod"
+
+Provision_ACR:
+  stage: provision_acr
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl jq unzip
+    - curl -fsSL https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip -o terraform.zip
+    - unzip terraform.zip
+    - mv terraform /usr/local/bin/
+  script:
+    - cd acr/
+    - terraform init
+    - terraform apply -auto-approve 
+    - terraform output -json > acr_outputs.json
+    - echo "ACR_NAME=$(jq -r .acr_name.value acr_outputs.json)" >> acr_env.sh
+    - echo "ACR_LOGIN=$(jq -r .login_server.value acr_outputs.json)" >> acr_env.sh
+  artifacts:
+    paths:
+      - infra/acr_env.sh
+  dependencies:
+    - Import_Resource_Group

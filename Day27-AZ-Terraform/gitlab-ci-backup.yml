@@ -1,0 +1,58 @@
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+default:
+  image:
+    name: hashicorp/terraform:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+cache:
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - infra/.terraform/
+
+Terraform_validate:
+  stage: validate
+  script:
+    # - echo "Current path: $(pwd)"
+    # - ls -al
+    - cd infra/
+    - terraform init -upgrade
+    - terraform validate
+
+Terraform_plan:
+  stage: plan
+  script:
+    - cd infra/
+    - terraform init -upgrade
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - infra/tfplan
+  dependencies:
+    - Terraform_validate
+
+Terraform_apply:
+  stage: apply
+  script:
+    - cd infra/
+    - terraform init -upgrade
+    - terraform apply -auto-approve tfplan
+  when: on_success
+  dependencies:
+    - Terraform_plan
+
+destroy:
+  stage: destroy
+  script:
+    - cd infra/
+    - terraform init -upgrade
+    - terraform destroy -auto-approve
+  when: manual
+  dependencies:
+    - Terraform_apply
